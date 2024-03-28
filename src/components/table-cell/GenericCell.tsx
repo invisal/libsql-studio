@@ -29,11 +29,11 @@ export default function GenericCell({
 
   const content = useMemo(() => {
     if (value === null) {
-      return <span className="text-gray-500">NULL</span>;
+      return <span className="text-gray-500 float-right">NULL</span>;
     }
 
     if (value === undefined) {
-      return <span className="text-gray-500">DEFAULT</span>;
+      return <span className="text-gray-500 float-right">DEFAULT</span>;
     }
 
     if (typeof value === "string") {
