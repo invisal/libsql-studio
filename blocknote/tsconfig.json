@@ -1,0 +1,21 @@
+{
+  "extends": ["@libsqlstudio/tsconfig/react"],
+  "compilerOptions": {
+    "tsBuildInfoFile": ".tsbuildinfo",
+    "baseUrl": "./",
+    "noImplicitReturns": false,
+    "jsx": "react",
+    "lib": ["es2023"],
+		"module": "esnext",
+		"target": "es2022",
+		"moduleResolution": "bundler",
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".eslintrc.cjs",
+    "*.js",
+    "*.ts",
+  ],
+  "exclude": ["node_modules", "dist"]
+}

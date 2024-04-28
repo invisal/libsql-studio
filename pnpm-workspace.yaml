@@ -1,4 +1,5 @@
 packages:
   - "./gui"
   - "./studio"
+  - "./blocknote"
   - "./config/*"
