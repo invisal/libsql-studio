@@ -70,6 +70,7 @@
     "cmdk": "^0.2.0",
     "cookies-next": "^4.1.1",
     "deep-equal": "^2.2.3",
+    "dexie": "^4.0.7",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.30.1",
     "eslint-plugin-jest": "^27.6.3",

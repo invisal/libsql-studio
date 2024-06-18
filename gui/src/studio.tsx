@@ -8,10 +8,12 @@ import type { BaseDriver } from "./drivers/base-driver";
 import { CollaborationDriver } from "./drivers/collaboration-driver";
 import { ReactElement } from "react";
 import { StudioExtension } from "./extension";
+import { SavedQueryDriver } from "./driver";
 
 interface StudioProps {
   driver: BaseDriver;
   collaboration?: CollaborationDriver;
+  savedQuery?: SavedQueryDriver;
   name: string;
   color: string;
 
@@ -29,6 +31,7 @@ export function Studio({
   theme,
   onThemeChange,
   collaboration,
+  savedQuery,
   name,
   color,
   extensions,
@@ -37,7 +40,11 @@ export function Studio({
 }: Readonly<StudioProps>) {
   return (
     <ThemeProvider theme={theme ?? "light"} onChange={onThemeChange}>
-      <DriverProvider driver={driver} collaborationDriver={collaboration}>
+      <DriverProvider
+        databaseDriver={driver}
+        collaborationDriver={collaboration}
+        savedQueryDriver={savedQuery}
+      >
         <ConfigProvider
           extensions={extensions}
           name={name}

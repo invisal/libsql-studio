@@ -1,11 +1,20 @@
+import { SavedQueryDriver } from "@gui/driver";
 import type { BaseDriver } from "@gui/drivers/base-driver";
 import type { CollaborationDriver } from "@gui/drivers/collaboration-driver";
-import { type PropsWithChildren, createContext, useContext } from "react";
+import {
+  type PropsWithChildren,
+  createContext,
+  useContext,
+  useMemo,
+} from "react";
 
-const DriverContext = createContext<{
+interface DriverListProps {
   databaseDriver: BaseDriver;
   collaborationDriver?: CollaborationDriver;
-}>({
+  savedQueryDriver?: SavedQueryDriver;
+}
+
+const DriverContext = createContext<DriverListProps>({
   databaseDriver: {} as unknown as BaseDriver,
 });
 
@@ -15,17 +24,15 @@ export function useDatabaseDriver() {
 
 export function DriverProvider({
   children,
-  driver,
+  databaseDriver,
   collaborationDriver,
-}: PropsWithChildren<{
-  driver: BaseDriver;
-  collaborationDriver?: CollaborationDriver;
-}>) {
+  savedQueryDriver,
+}: PropsWithChildren<DriverListProps>) {
+  const value = useMemo(() => {
+    return { databaseDriver, collaborationDriver, savedQueryDriver };
+  }, [databaseDriver, collaborationDriver, savedQueryDriver]);
+
   return (
-    <DriverContext.Provider
-      value={{ databaseDriver: driver, collaborationDriver }}
-    >
-      {children}
-    </DriverContext.Provider>
+    <DriverContext.Provider value={value}>{children}</DriverContext.Provider>
   );
 }

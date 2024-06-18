@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { identify } from "sql-query-identifier";
-import { LucidePlay } from "lucide-react";
+import { LucidePlay, LucideSave } from "lucide-react";
 import SqlEditor from "@gui/components/sql-editor";
 import {
   ResizablePanelGroup,
@@ -21,6 +21,7 @@ import { MultipleQueryProgress, multipleQuery } from "@gui/lib/multiple-query";
 import { DatabaseResultStat } from "@gui/driver";
 import ResultStats from "../result-stat";
 import isEmptyResultStats from "@gui/lib/empty-stats";
+import { Toolbar, ToolbarButton } from "../toolbar";
 
 export default function QueryWindow() {
   const { schema } = useAutoComplete();
@@ -98,25 +99,27 @@ export default function QueryWindow() {
           </div>
           <div className="grow-0 shrink-0">
             <Separator />
-            <div className="flex gap-1 p-1">
-              <Button variant={"ghost"} onClick={() => onRunClicked()}>
-                <LucidePlay className="w-4 h-4 mr-2" />
-                Run Current{" "}
-                <span className="text-xs ml-2 px-2 bg-secondary py-1 rounded">
-                  {KEY_BINDING.run.toString()}
-                </span>
-              </Button>
+            <Toolbar>
+              <ToolbarButton primary icon={LucideSave} text="Save" />
 
-              <Button variant={"ghost"} onClick={() => onRunClicked(true)}>
-                <LucidePlay className="w-4 h-4 mr-2" />
-                Run All
-              </Button>
+              <ToolbarButton
+                onClick={() => onRunClicked()}
+                icon={LucidePlay}
+                text="Run Current"
+                shortcut={KEY_BINDING.run.toString()}
+              />
+
+              <ToolbarButton
+                onClick={() => onRunClicked(true)}
+                icon={LucidePlay}
+                text="Run All"
+              />
 
               <div className="grow justify-end items-center flex text-sm mr-2 gap-2">
                 <div>Ln {lineNumber}</div>
                 <div>Col {columnNumber + 1}</div>
               </div>
-            </div>
+            </Toolbar>
           </div>
         </div>
       </ResizablePanel>
