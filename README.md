@@ -1,31 +1,11 @@
 # LibSQL Studio
 
-LibSQL Studio is a lightweight LibSQL graphical client on your browser written using NextJS.
+LibSQL Studio is a fully-featured, lightweight GUI client for managing SQLite-based databases like Turso, LibSQL, and rqlite. It runs entirely in your browser, so there's no need to download anything.
 
-Try [LibSQL Studio](https://libsqlstudio.com/) online here.
+| Try us | |
+|-----|-----|
+|[![LibSQL Studio](https://github.com/user-attachments/assets/6fd20629-c5f5-403b-825d-03b66a66a151)](https://libsqlstudio.com)| Try it on our website. Support Turso, rqlite, sqlite file, and more |
+|[![LibSQL Studio](https://github.com/user-attachments/assets/a4e52a27-fbbd-410f-b5fe-bc062fbadf0a)](https://libsqlstudio.com/playground/client?template=chinook)|Try our the editor with pre-loaded data to get an idea of how it works. **Noted that not all features are enabled.**|
 
-![LibSQL Studo Screenshot](https://github.com/invisal/libsql-web-viewer/assets/4539653/82014129-2ea3-4619-9287-2dc756baba6c)
 
-**Features**
-
-- Optimize table result to view large query result
-- Edit your table data in spreadsheet-like editor
-- Query editor with basic syntax highlighting and basic auto complete
-- Basic connection management
-
-## How to contribute
-
-To run the project
-
-```
-pnpm install
-cd studio
-pnpm run dev
-```
-
-**Folder structure**
-
-| Folder    | Description                                                                                                                                                                   |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/gui`    | This is standalone database GUI React component. It is not tied to any specific database driver, allowing users to extend and integrate it into their own projects with ease. |
-| `/studio` | It is complete database GUI client as seen in https://libsqlstudio.com. Come with database drivers and many other features                                                    |
+![libsqlstudio-git-preview (7)](https://github.com/user-attachments/assets/804465a2-e5e2-4cef-8299-55432ebb65fd)
