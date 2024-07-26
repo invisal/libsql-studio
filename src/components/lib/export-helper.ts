@@ -14,22 +14,23 @@ export function selectArrayFromIndexList<T = unknown>(
 export function exportRowsToSqlInsert(
   tableName: string,
   headers: string[],
-  records: unknown[][]
+  records: unknown[][],
+  batchSize: number
 ): string {
   const result: string[] = [];
-
   const headersPart = headers.map(escapeIdentity).join(", ");
 
-  for (const record of records) {
-    const valuePart = record.map(escapeSqlValue).join(", ");
-    const line = `INSERT INTO ${escapeIdentity(
-      tableName
-    )}(${headersPart}) VALUES(${valuePart});`;
+  for (let i = 0; i < records.length; i += batchSize) {
+    const batch = records.slice(i, i + batchSize);
+    const valuesPart = batch
+      .map((record) => `(${record.map(escapeSqlValue).join(", ")})`)
+      .join(",\n  ");
 
+    const line = `INSERT INTO ${escapeIdentity(tableName)}(${headersPart}) VALUES\n  ${valuesPart};`;
     result.push(line);
   }
 
-  return result.join("\r\n");
+  return result.join("\n\n");
 }
 
 function cellToExcelValue(value: unknown) {
@@ -93,14 +94,116 @@ export function exportRowsToCsv(
   return result.join("\n");
 }
 
+function truncateText(text: string, limit: number): string {
+  if (text.length <= limit) return text;
+  return `${text.slice(0, limit)}...`;
+}
+
+function calculateColumnWidths(
+  headers: string[],
+  records: unknown[][],
+  cellTextLimit: number
+): number[] {
+  return headers.map((header, index) => {
+    const maxContentWidth = Math.max(
+      header.length,
+      ...records.map((record) => {
+        const cellContent = String(record[index]);
+        return cellContent.length > cellTextLimit
+          ? cellTextLimit + 3
+          : cellContent.length;
+      })
+    );
+    return Math.min(maxContentWidth, cellTextLimit + 3);
+  });
+}
+
+export function exportRowsToMarkdown(
+  headers: string[],
+  records: unknown[][],
+  cellTextLimit: number
+): string {
+  const result: string[] = [];
+  const columnWidths = calculateColumnWidths(headers, records, cellTextLimit);
+
+  // Add headers
+  const headerRow = `| ${headers.map((h, i) => truncateText(h, cellTextLimit).padEnd(columnWidths[i])).join(" | ")} |`;
+  result.push(headerRow);
+
+  // Add separator
+  const separator = `| ${columnWidths.map((width) => "-".repeat(width)).join(" | ")} |`;
+  result.push(separator);
+
+  // Add records
+  for (const record of records) {
+    const row = `| ${record
+      .map((cell, index) =>
+        truncateText(String(cell), cellTextLimit).padEnd(columnWidths[index])
+      )
+      .join(" | ")} |`;
+    result.push(row);
+  }
+
+  return result.join("\n");
+}
+
+export function exportRowsToAsciiTable(
+  headers: string[],
+  records: unknown[][],
+  cellTextLimit: number
+): string {
+  const result: string[] = [];
+  const columnWidths = calculateColumnWidths(headers, records, cellTextLimit);
+
+  // Create top border
+  const topBorder = `┌${columnWidths.map((width) => "─".repeat(width + 2)).join("┬")}┐`;
+  result.push(topBorder);
+
+  // Add headers
+  const headerRow = `│ ${headers
+    .map((h, i) => truncateText(h, cellTextLimit).padEnd(columnWidths[i]))
+    .join(" │ ")} │`;
+  result.push(headerRow);
+
+  // Add separator
+  const headerSeparator = `╞${columnWidths.map((width) => "═".repeat(width + 2)).join("╪")}╡`;
+  result.push(headerSeparator);
+
+  // Add records
+  for (const record of records) {
+    const row = `│ ${record
+      .map((cell, index) =>
+        truncateText(String(cell), cellTextLimit).padEnd(columnWidths[index])
+      )
+      .join(" │ ")} │`;
+    result.push(row);
+
+    // Add separator between rows, except for the last row
+    if (record !== records[records.length - 1]) {
+      const rowSeparator = `├${columnWidths.map((width) => "─".repeat(width + 2)).join("┼")}┤`;
+      result.push(rowSeparator);
+    }
+  }
+
+  // Add bottom border
+  const bottomBorder = `└${columnWidths.map((width) => "─".repeat(width + 2)).join("┴")}┘`;
+  result.push(bottomBorder);
+
+  return result.join("\n");
+}
+
 export function getFormatHandlers(
   records: unknown[][],
   headers: string[],
-  tableName: string
+  tableName: string,
+  cellTextLimit: number,
+  batchSize: number
 ): Record<string, (() => string) | undefined> {
   return {
     csv: () => exportRowsToCsv(headers, records),
     json: () => exportRowsToJson(headers, records),
-    sql: () => exportRowsToSqlInsert(tableName, headers, records),
+    sql: () => exportRowsToSqlInsert(tableName, headers, records, batchSize),
+    markdown: () => exportRowsToMarkdown(headers, records, cellTextLimit),
+    ascii: () => exportRowsToAsciiTable(headers, records, cellTextLimit),
   };
 }
