@@ -4,6 +4,7 @@ import * as schema from "./../db/schema";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { sql } from "drizzle-orm";
 import { generateId } from "lucia";
+import { NextRequest } from "next/server";
 
 let TOKEN_CURRENT: string | undefined = undefined;
 
@@ -23,7 +24,11 @@ jest.mock("next/headers", () => ({
     },
   })),
   headers: jest.fn(() => ({
-    get: () => undefined,
+    get: (name: string) => {
+      if (name === "authorization") return `Bearer ${TOKEN_CURRENT}`;
+      if (name === "Content-Type") return "application/json";
+      return undefined;
+    },
   })),
 }));
 
@@ -47,6 +52,16 @@ jest.mock("react", () => {
   return {
     ...originalModule,
     cache: (v: any) => v,
+  };
+});
+
+jest.mock("libsql-stateless-easy", () => {
+  return {
+    createClient: () => {
+      return createClient({
+        url: ":memory:",
+      });
+    },
   };
 });
 
@@ -174,4 +189,31 @@ export async function makeTestNamespace(
 
 export function mockToken(token: string) {
   TOKEN_CURRENT = token;
+}
+
+export async function testRequestApi<BodyType = unknown, Params = unknown>(
+  handler: (req: NextRequest, params: { params: Params }) => Promise<Response>,
+  options: { sessionToken?: string; params: Params; body?: BodyType }
+) {
+  const headers = new Headers();
+
+  if (options.sessionToken) {
+    headers.set("Authorization", `Bearer ${options.sessionToken}`);
+  }
+
+  const previousToken = TOKEN_CURRENT;
+  TOKEN_CURRENT = options.sessionToken;
+
+  const r = await handler(
+    {
+      headers,
+      json: options.body ? async () => options.body : undefined,
+    } as NextRequest,
+    { params: options.params }
+  );
+
+  // Restore the previous token
+  TOKEN_CURRENT = previousToken;
+
+  return { data: await r.json(), status: r.status };
 }
