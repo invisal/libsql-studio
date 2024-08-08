@@ -1,10 +1,4 @@
-import {
-  DatabaseRoleAccess,
-  DatabaseRoleType,
-  database,
-  database_role,
-  database_user_role,
-} from "@/db/schema";
+import { database, database_role, database_user_role } from "@/db/schema";
 import { User } from "lucia";
 import withUser from "./with-user";
 import { NextResponse } from "next/server";
@@ -13,16 +7,24 @@ import { headers } from "next/headers";
 import { get_database } from "@/db";
 import { getSession } from "./auth";
 import { ApiError } from "./api-error";
+import parseSafeJson from "./json-safe";
+import { PermissionController } from "@/app/api/ops/[database_id]/permission-controller";
+
+export interface DatabasePermissionTableRule {
+  name: string;
+  insert: boolean;
+  update: boolean;
+  delete: boolean;
+}
+
+export interface DatabasePermissionRule {
+  tables: DatabasePermissionTableRule[];
+}
 
 export interface DatabasePermission {
   isOwner: boolean;
   canExecuteQuery: boolean;
-  roles: {
-    type: DatabaseRoleType;
-    access: DatabaseRoleAccess;
-    tableName: string | null;
-    columnName: string | null;
-  }[];
+  rules: PermissionController;
 }
 
 export async function getDatabaseWithAuth(databaseId: string) {
@@ -81,9 +83,6 @@ export default function withDatabaseOperation<T = unknown>(
       const roleId = databaseRole.roleId ?? "";
       const permission = await db.query.database_role.findFirst({
         where: eq(database_role.id, roleId),
-        with: {
-          permissions: true,
-        },
       });
 
       if (!permission) {
@@ -103,12 +102,13 @@ export default function withDatabaseOperation<T = unknown>(
         permission: {
           isOwner: !!permission.isOwner,
           canExecuteQuery: !!permission.canExecuteQuery,
-          roles: permission.permissions.map((p) => ({
-            type: p.type ?? "table",
-            access: p.access ?? "read",
-            tableName: p.tableName,
-            columnName: p.columnName,
-          })),
+          rules: new PermissionController(
+            !!permission.isOwner,
+            !!permission.canExecuteQuery,
+            parseSafeJson<DatabasePermissionRule>(permission.permissions, {
+              tables: [],
+            })
+          ),
         },
       });
     }

@@ -8,16 +8,11 @@ import { HttpStatus } from "@/constants/http-status";
 const handleSelectTableRequest: DatabaseOperationHandler<
   RequestOperationSelectTable
 > = async ({ database, body, permission }) => {
-  const client = await createTursoEdgeDriver(database);
+  permission.rules.checkViewTable(body.tableName, {
+    raw: body.options?.whereRaw,
+  });
 
-  if (body.options.whereRaw && !permission.canExecuteQuery) {
-    return NextResponse.json(
-      {
-        error: "No permission to execute query",
-      },
-      { status: 500 }
-    );
-  }
+  const client = await createTursoEdgeDriver(database);
 
   if (body.options.orderBy) {
     for (const orderOption of body.options.orderBy) {

@@ -5,10 +5,11 @@ import { RequestOperationUpdateTableData } from "@/lib/api/api-request-types";
 
 const handleUpdateTableDataRequest: DatabaseOperationHandler<
   RequestOperationUpdateTableData
-> = async ({ database, body }) => {
+> = async ({ database, permission, body }) => {
+  permission.rules.checkUpdateTable(body.tableName, body.ops);
+
   const client = await createTursoEdgeDriver(database);
   const tableName = body.tableName;
-
   const tableSchema = await client.tableSchema(tableName);
 
   try {

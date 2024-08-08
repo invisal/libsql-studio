@@ -32,8 +32,7 @@ export default function withUser<ParamsType = unknown>(
       if (e instanceof ApiError) {
         return new Response(
           JSON.stringify({
-            message: e.message,
-            detailedMessage: e.detailedMessage,
+            error: e.message,
           }),
           { status: e.status }
         );
@@ -41,8 +40,7 @@ export default function withUser<ParamsType = unknown>(
 
       return new Response(
         JSON.stringify({
-          message: "Something went wrong",
-          detailedMessage: e instanceof Error ? e.message : "Unknown Error",
+          error: e instanceof Error ? e.message : "Unknown Error",
         }),
         { status: HttpStatus.INTERNAL_SERVER_ERROR }
       );

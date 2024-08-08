@@ -5,7 +5,8 @@ import { RequestOperationFindFirst } from "@/lib/api/api-request-types";
 
 const handleFindFirst: DatabaseOperationHandler<
   RequestOperationFindFirst
-> = async ({ database, body }) => {
+> = async ({ database, body, permission }) => {
+  permission.rules.checkViewTable(body.tableName);
   const client = await createTursoEdgeDriver(database);
 
   try {

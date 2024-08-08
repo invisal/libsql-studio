@@ -13,6 +13,13 @@ export default function SettingSidebar() {
         }}
         icon={LucideUser}
       />
+      <ListButtonItem
+        text="Manage Roles"
+        onClick={() => {
+          openTab({ type: "roles" });
+        }}
+        icon={LucideUser}
+      />
     </div>
   );
 }

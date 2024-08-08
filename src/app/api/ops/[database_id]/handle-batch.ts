@@ -6,15 +6,7 @@ import { RequestOperationBatch } from "@/lib/api/api-request-types";
 const handleBatchRequest: DatabaseOperationHandler<
   RequestOperationBatch
 > = async ({ permission, database, body }) => {
-  if (!permission.canExecuteQuery) {
-    return NextResponse.json(
-      {
-        error: "No permission to execute query",
-      },
-      { status: 500 }
-    );
-  }
-
+  permission.rules.checkExecuteQuery();
   const client = await createTursoEdgeDriver(database);
 
   try {

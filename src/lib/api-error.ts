@@ -1,6 +1,6 @@
 interface ApiErrorConstructor {
   message: string;
-  status: number;
+  status?: number;
   detailedMessage?: string;
 }
 
@@ -11,7 +11,7 @@ export class ApiError extends Error {
   constructor({ message, status, detailedMessage }: ApiErrorConstructor) {
     super(message);
     this.name = "ApiError";
-    this.status = status;
+    this.status = status ?? 500;
     this.detailedMessage = detailedMessage;
   }
 }

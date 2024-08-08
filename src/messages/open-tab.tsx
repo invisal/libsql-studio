@@ -13,6 +13,7 @@ import SchemaEditorTab from "@/components/gui/tabs/schema-editor-tab";
 import TableDataWindow from "@/components/gui/tabs/table-data-tab";
 import UsersTab from "@/components/gui/tabs/users-tabs";
 import TriggerTab from "@/components/gui/tabs/trigger-tab";
+import RolesTab from "@/components/gui/tabs/roles-tabs";
 
 interface OpenTableTab {
   type: "table";
@@ -38,6 +39,10 @@ interface OpenUserTab {
   type: "user";
 }
 
+interface OpenRolesTab {
+  type: "roles";
+}
+
 interface OpenTriggerTab {
   type: "trigger";
   tableName?: string;
@@ -47,6 +52,7 @@ interface OpenTriggerTab {
 export type OpenTabsProps =
   | OpenTableTab
   | OpenQueryTab
+  | OpenRolesTab
   | OpenTableSchemaTab
   | OpenUserTab
   | OpenTriggerTab;
@@ -71,6 +77,7 @@ function generateKeyFromTab(tab: OpenTabsProps) {
   if (tab.type === "schema")
     return !tab.tableName ? "create-schema" : "schema-" + tab.tableName;
   if (tab.type === "user") return "user";
+  if (tab.type === "roles") return "roles";
 
   return "trigger-" + (tab.name ?? "");
 }
@@ -93,6 +100,8 @@ function generateTitle(tab: OpenTabsProps) {
   if (tab.type === "table") return tab.tableName;
   if (tab.type === "schema") return tab.tableName ? tab.tableName : "New Table";
   if (tab.type === "user") return "User & Permission";
+  if (tab.type === "roles") return "Roles";
+
   return tab.name ?? "";
 }
 
@@ -115,6 +124,8 @@ function generateComponent(tab: OpenTabsProps, title: string) {
   if (tab.type === "schema")
     return <SchemaEditorTab tableName={tab.tableName} />;
   if (tab.type === "user") return <UsersTab />;
+  if (tab.type === "roles") return <RolesTab />;
+
   return <TriggerTab name={tab.name ?? ""} />;
 }
 

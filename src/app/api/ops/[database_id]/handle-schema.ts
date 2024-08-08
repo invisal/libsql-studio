@@ -5,7 +5,9 @@ import { RequestOperationSchema } from "@/lib/api/api-request-types";
 
 const handleSchemaRequest: DatabaseOperationHandler<
   RequestOperationSchema
-> = async ({ database, body }) => {
+> = async ({ database, body, permission }) => {
+  permission.rules.checkViewTable(body.tableName);
+
   const client = await createTursoEdgeDriver(database);
 
   try {

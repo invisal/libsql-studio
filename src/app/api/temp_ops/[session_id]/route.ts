@@ -8,6 +8,7 @@ import { ApiError } from "@/lib/api-error";
 import { HttpStatus } from "@/constants/http-status";
 import parseSafeJson from "@/lib/json-safe";
 import { SavedConnectionItemConfigConfig } from "@/app/(theme)/connect/saved-connection-storage";
+import { PermissionController } from "../../ops/[database_id]/permission-controller";
 
 export const runtime = "edge";
 
@@ -52,7 +53,11 @@ export const POST = withErrorHandler<{ params: { session_id: string } }>(
 
     return await databaseOperationHandler({
       body,
-      permission: { canExecuteQuery: true, isOwner: true, roles: [] },
+      permission: {
+        canExecuteQuery: true,
+        isOwner: true,
+        rules: new PermissionController(true, true, { tables: [] }),
+      },
       database: {
         databaseName: "",
         driver: session.driver,
