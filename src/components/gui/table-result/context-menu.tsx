@@ -27,6 +27,7 @@ export default function useTableResultContextMenu({
 }) {
   const { openEditor } = useFullEditor();
   const { extensions } = useConfig();
+  const batchSize: number = 1;
 
   return useCallback(
     ({
@@ -207,7 +208,8 @@ export default function useTableResultContextMenu({
                     exportRowsToSqlInsert(
                       tableName ?? "UnknownTable",
                       headers,
-                      state.getSelectedRowsArray()
+                      state.getSelectedRowsArray(),
+                      batchSize
                     )
                   );
                 }

@@ -484,6 +484,10 @@ export default class OptimizeTableState {
     return Array.from(this.selectedRows.values());
   }
 
+  getSelectedRows(): OptimizeTableRowValue[] {
+    return this.data.filter((row, index) => this.selectedRows.has(index));
+  }
+
   selectRow(y: number, toggle?: boolean) {
     if (toggle) {
       if (this.selectedRows.has(y)) {
