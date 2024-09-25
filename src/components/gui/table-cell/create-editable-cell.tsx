@@ -126,7 +126,7 @@ export default function createEditableCell<T = unknown>({
 
     const applyChange = useCallback(
       (v: DatabaseValue<string>, shouldExitEdit = true) => {
-        if (onChange) onChange(toValue(v));
+        if (onChange) onChange(toValue(v) ?? (v as DatabaseValue<T>));
         if (shouldExitEdit) {
           state.exitEditMode();
         }
