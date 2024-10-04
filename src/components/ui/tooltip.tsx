@@ -5,7 +5,15 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 import { cn } from "@/lib/utils";
 
-const TooltipProvider = TooltipPrimitive.Provider;
+interface TooltipProviderProps {
+  children: React.ReactNode;
+  delayDuration?: number;
+  skipDelayDuration?: number;
+  disableHoverableContent?: boolean;
+}
+
+const TooltipProvider =
+  TooltipPrimitive.Provider as React.FC<TooltipProviderProps>;
 
 const Tooltip = TooltipPrimitive.Root;
 
